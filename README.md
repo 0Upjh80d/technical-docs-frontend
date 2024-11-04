@@ -1,8 +1,64 @@
 # Technical Documentation for Data Analytics & AI using MkDocs Material
 
-## Install Dependencies <a name="installation"></a>
+## Table of Contents
 
-### Anaconda (Recommended)
+- [Getting Started](#getting-started)
+  - [Option 1: Viewing the Deployed Documentation (Recommended)](#option-1-viewing-the-deployed-documentation-recommended)
+  - [Option 2: Serving Locally](#option-2-serving-locally)
+  - [Option 3: Building the Documentation](#option-3-building-the-documentation)
+- [Install Dependencies](#install-dependencies)
+  - [Anaconda (Recommended)](#anaconda-recommended)
+  - [Poetry](#poetry)
+  - [venv](#venv)
+
+## Getting Started <a id="getting-started"></a>
+
+We provide several options for you to access our documentation based on your needs. You may choose one or more of the following options based on your requirements.
+
+### Option 1: Viewing the Deployed Documentation (Recommended) <a id="option-1-viewing-the-deployed-documentation-recommended"></a>
+
+Directly head to the deployed documentation at this [link](https://0upjh80d.github.io/technical-docs-frontend/) to view the documentation. This option requires no installation of setting up and is great for non-technical stakeholders or project managers.
+
+> [!NOTE]
+> For the subsequent options, we recommend viewing the section [Install Dependencies](#install-dependencies) first.
+
+### Option 2: Serving Locally <a id="option-2-serving-locally"></a>
+
+Run the following command to view the documentation in `localhost`:
+
+```bash
+mkdcos serve
+```
+
+You should see the following output:
+
+```bash
+INFO    -  Building documentation...
+INFO    -  Cleaning site directory
+INFO    -  Documentation built in 0.69 seconds
+INFO    -  [10:27:13] Watching paths for changes: 'docs', 'mkdocs.yml'
+INFO    -  [10:27:13] Serving on http://127.0.0.1:8000/
+```
+
+### Option 3: Building the Documentation <a id="option-3-building-the-documentation"></a>
+
+Alternatively, you may build the documentation with the following command:
+
+```bash
+mkdocs build
+```
+
+```bash
+INFO    -  Cleaning site directory
+INFO    -  Building documentation to directory: /path/to/site
+INFO    -  Documentation built in 1.13 seconds
+```
+
+You should now see a folder in your root directory called `site`. This folder can be shared with internal members or across teams for portability. However, it lacks for in terms of user experience.
+
+## Install Dependencies <a id="install-dependencies"></a>
+
+### Anaconda (Recommended) <a id="anaconda-recommended"></a>
 
 You can download the Anaconda Distribution for your respective operating system [here](https://docs.anaconda.com/anaconda/install/). You may also find out how to get started with Anaconda Distribution [here](https://docs.anaconda.com/anaconda/getting-started/). To verfiy your installation, you can head to the Command Line Interface (CLI) and run the following command:
 
@@ -25,7 +81,7 @@ conda activate <VENV_NAME>
 pip install -r requirements.txt
 ```
 
-### Poetry
+### Poetry <a id="poetry"></a>
 
 Refer to the documentation [here](https://python-poetry.org/docs/#installing-with-the-official-installer) (recommended) on how to install Poetry based on your operating system.
 
@@ -62,7 +118,7 @@ If there is no [`poetry.lock`](poetry.lock) file, Poetry will create one after d
 
 ---
 
-### venv
+### venv <a id="venv"></a>
 
 You can use Python's native virtual environment `venv` to setup the project
 
@@ -95,41 +151,3 @@ pip install -r requirements.txt
 
 > [!TIP]
 > If you're using Python's native virtual environment `venv`, it is best practice to name your virtual environment `venv`.
-
----
-
-## Getting Started
-
-### Option 1: Serving Locally
-
-Run the following command to view the documentation in localhost:
-
-```bash
-mkdcos serve
-```
-
-You should see the following output:
-
-```bash
-INFO    -  Building documentation...
-INFO    -  Cleaning site directory
-INFO    -  Documentation built in 0.69 seconds
-INFO    -  [10:27:13] Watching paths for changes: 'docs', 'mkdocs.yml'
-INFO    -  [10:27:13] Serving on http://127.0.0.1:8000/
-```
-
-### Option 2: Building the Documentation
-
-Alternatively, you may build the documentation with the following command:
-
-```bash
-mkdocs build
-```
-
-```bash
-INFO    -  Cleaning site directory
-INFO    -  Building documentation to directory: /Users/wilsvenleong/Downloads/Learning Materials/technical-docs-frontend/site
-INFO    -  Documentation built in 1.13 seconds
-```
-
-You should now see a folder in your root directory called `site`. This folder can be shared with internal members or across teams for portability. However, it lacks for in terms of user experience.
