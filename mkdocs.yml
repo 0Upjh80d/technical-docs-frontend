@@ -200,5 +200,9 @@ nav:
                       - projects/genai/conversational-assistant/webapp/frontend/services/preference.md
                       - projects/genai/conversational-assistant/webapp/frontend/services/audio-service.md
                       - projects/genai/conversational-assistant/webapp/frontend/services/profile-service.md
+
+              - Backend:
+                  - API:
+                      - projects/genai/conversational-assistant/webapp/backend/api/endpoints.md
   - Articles:
       - blog/index.md

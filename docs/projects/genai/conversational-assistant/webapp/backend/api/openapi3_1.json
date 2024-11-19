@@ -1,0 +1,555 @@
+{
+  "openapi": "3.1.1",
+  "info": {
+    "title": "Conversational Assistant Backend",
+    "version": "0.0.1",
+    "description": "Backend APIs for Conversational Assistant"
+  },
+  "servers": [
+    {
+      "url": "https://app-backend-5ivxbh72auo44.azurewebsites.net",
+      "description": "Conversational Assistant Endpoint"
+    }
+  ],
+  "paths": {
+    "/chat/stream": {
+      "post": {
+        "summary": "Send chat message with streaming response",
+        "tags": [
+          "Chat"
+        ],
+        "requestBody": {
+          "description": "Message to be sent",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TextChatRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TextChatResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/voice/stream": {
+      "post": {
+        "summary": "Send voice message with streaming response",
+        "tags": [
+          "Voice"
+        ],
+        "requestBody": {
+          "description": "Message to be sent",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VoiceChatRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VoiceChatResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/ws/transcribe": {
+      "post": {
+        "summary": "Transcribe audio to text",
+        "description": "`/ws/transcribe` endpoint is designed to accept WebSocket connections, not standard HTTP `POST` requests. Hence, it is not a bug it isn't working here.",
+        "tags": [
+          "Transcribe"
+        ],
+        "requestBody": {
+          "description": "Audio to be transcribed",
+          "required": true,
+          "content": {
+            "audio/pcm": {
+              "schema": {
+                "type": "string",
+                "format": "binary"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TranscriptionResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/feedback": {
+      "post": {
+        "summary": "Send feedback to CosmosDB",
+        "tags": [
+          "Feedback"
+        ],
+        "requestBody": {
+          "description": "Message to be sent",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FeedbackRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/speech": {
+      "post": {
+        "summary": "Transcribe text to speech",
+        "description": "Swagger.io is unable to render the MP3 audio hence playback is impossible. Please use Postman if you want to playback the transcribed audio for validation.",
+        "tags": [
+          "Speech"
+        ],
+        "requestBody": {
+          "description": "Message to be sent",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SpeechRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "audio/mp3": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "TextChatRequest": {
+        "type": "object",
+        "properties": {
+          "language": {
+            "type": "string",
+            "enum": [
+              "english",
+              "chinese",
+              "malay",
+              "tamil",
+              "spoken"
+            ],
+            "description": "Response language defined by user",
+            "default": "spoken"
+          },
+          "chat_history": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ChatMessage"
+            },
+            "maxItems": 8,
+            "default": [
+              {
+                "role": "assistant",
+                "content": "Hi how can I help you?"
+              }
+            ]
+          },
+          "profile": {
+            "type": "object",
+            "$ref": "#/components/schemas/Profile",
+            "default": {
+              "profile_type": "general",
+              "user_age": 20,
+              "user_gender": "male",
+              "user_condition": ""
+            }
+          },
+          "query": {
+            "type": "object",
+            "$ref": "#/components/schemas/ChatMessage",
+            "example": {
+              "role": "user",
+              "content": "How to sleep better?"
+            }
+          }
+        },
+        "required": [
+          "language",
+          "chat_history",
+          "profile",
+          "query"
+        ]
+      },
+      "TextChatResponse": {
+        "type": "object",
+        "properties": {
+          "response_message": {
+            "type": "string",
+            "description": "The message content",
+            "example": "To improve sleep quality, maintain a consistent sleep schedule, create a comfortable sleep environment, and limit exposure to screens before bedtime."
+          },
+          "sources": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Source"
+            },
+            "description": "List of sources used for the response"
+          }
+        },
+        "required": [
+          "response_message",
+          "sources"
+        ]
+      },
+      "VoiceChatRequest": {
+        "type": "object",
+        "properties": {
+          "language": {
+            "type": "string",
+            "enum": [
+              "english",
+              "chinese",
+              "malay",
+              "tamil",
+              "spoken"
+            ],
+            "description": "Response language defined by user",
+            "default": "spoken"
+          },
+          "chat_history": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ChatMessage"
+            },
+            "maxItems": 8,
+            "default": [
+              {
+                "role": "assistant",
+                "content": "Hi how can I help you?"
+              }
+            ]
+          },
+          "profile": {
+            "type": "object",
+            "$ref": "#/components/schemas/Profile",
+            "default": {
+              "profile_type": "general",
+              "user_age": 20,
+              "user_gender": "male",
+              "user_condition": ""
+            }
+          },
+          "query": {
+            "type": "object",
+            "$ref": "#/components/schemas/ChatMessage",
+            "example": {
+              "role": "user",
+              "content": "How to sleep better?"
+            }
+          }
+        },
+        "required": [
+          "language",
+          "chat_history",
+          "profile",
+          "query"
+        ]
+      },
+      "VoiceChatResponse": {
+        "type": "object",
+        "properties": {
+          "response_message": {
+            "type": "string",
+            "description": "The message content",
+            "example": "To improve sleep quality, maintain a consistent sleep schedule, create a comfortable sleep environment, and limit exposure to screens before bedtime."
+          },
+          "audio_base64": {
+            "type": "string",
+            "description": "Base64 encoded audio file of the response",
+            "example": "data:audio/wav;base64,UklGRuy3AABXQVZ...RkYmRkYg==).play();"
+          },
+          "sources": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Source"
+            },
+            "description": "List of sources used for the response"
+          }
+        },
+        "required": [
+          "response_message",
+          "audio_base64",
+          "sources"
+        ]
+      },
+      "FeedbackRequest": {
+        "type": "object",
+        "properties": {
+          "date_time": {
+            "type": "string",
+            "example": "31/12/9999, 00:00:00"
+          },
+          "feedback_type": {
+            "type": "string",
+            "enum": [
+              "positive",
+              "negative"
+            ],
+            "example": "positive"
+          },
+          "feedback_category": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "example": [
+              "Straightforward Answer"
+            ]
+          },
+          "feedback_remarks": {
+            "type": "string",
+            "default": "",
+            "example": "Good response (from Swagger.io)"
+          },
+          "user_profile": {
+            "type": "object",
+            "$ref": "#/components/schemas/Profile"
+          },
+          "chat_history": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ChatMessageWithSource"
+            },
+            "maxItems": 8,
+            "example": []
+          }
+        },
+        "required": [
+          "date_time",
+          "feedback_type",
+          "feedback_category",
+          "feedback_remarks",
+          "user_profile",
+          "chat_history"
+        ]
+      },
+      "SpeechRequest": {
+        "type": "object",
+        "properties": {
+          "text": {
+            "type": "string",
+            "description": "Text to be converted to speech",
+            "example": "To improve sleep quality, maintain a consistent sleep schedule, create a comfortable sleep environment, and limit exposure to screens before bedtime."
+          }
+        }
+      },
+      "ChatMessage": {
+        "type": "object",
+        "properties": {
+          "role": {
+            "type": "string",
+            "description": "Role of the message sender (user or assistant)",
+            "enum": [
+              "user",
+              "assistant"
+            ]
+          },
+          "content": {
+            "type": "string",
+            "description": "Content of the message",
+            "example": "How to sleep better?"
+          }
+        },
+        "required": [
+          "role",
+          "content"
+        ]
+      },
+      "ChatMessageWithSource": {
+        "type": "object",
+        "properties": {
+          "role": {
+            "type": "string",
+            "description": "Role of the message sender (user or assistant)",
+            "enum": [
+              "user",
+              "assistant"
+            ],
+            "example": "user"
+          },
+          "content": {
+            "type": "string",
+            "description": "Content of the message",
+            "example": "How to sleep better?"
+          },
+          "sources": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Source"
+            },
+            "description": "List of sources used for the response"
+          }
+        },
+        "required": [
+          "role",
+          "content",
+          "sources"
+        ]
+      },
+      "TranscriptionResponse": {
+        "type": "object",
+        "properties": {
+          "text": {
+            "type": "string",
+            "description": "Transcribed text",
+            "example": "How can I sleep better?"
+          },
+          "is_final": {
+            "type": "boolean",
+            "description": "Whether the transcription is final"
+          }
+        }
+      },
+      "Profile": {
+        "type": "object",
+        "properties": {
+          "profile_type": {
+            "type": "string",
+            "description": "Profile type",
+            "enum": [
+              "myself",
+              "others",
+              "general"
+            ],
+            "default": "myself"
+          },
+          "user_age": {
+            "type": "integer",
+            "description": "Age of the user",
+            "example": 30,
+            "default": -1
+          },
+          "user_gender": {
+            "type": "string",
+            "description": "Gender of the user",
+            "default": "male",
+            "enum": [
+              "male",
+              "female"
+            ]
+          },
+          "user_condition": {
+            "type": "string",
+            "description": "Medical condition of the user (Empty if general profile)",
+            "example": "Diabetes and hypertension",
+            "default": ""
+          }
+        },
+        "required": [
+          "profile_type",
+          "user_age",
+          "user_gender",
+          "user_condition"
+        ]
+      },
+      "Source": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "48c31b266aba_1443447_content_content_pages_0"
+          },
+          "title": {
+            "type": "string",
+            "example": "10 Tips on Better Sleep"
+          },
+          "content_category": {
+            "type": "string",
+            "example": "live-healthy-articles"
+          },
+          "category_description": {
+            "type": "string",
+            "example": "Here are the top 10 tips from health professionals on how to get better sleep!"
+          },
+          "chunk": {
+            "type": "string",
+            "example": "Tip #1: To sleep better... Tip #10: ..."
+          },
+          "full_url": {
+            "type": "string",
+            "example": "https://www.how-to-sleep-better.com/health/hub"
+          },
+          "pr_name": {
+            "type": "string",
+            "example": "Health Promotion Board"
+          },
+          "cover_image_url": {
+            "type": "string",
+            "example": "https://image/url/if/exists"
+          },
+          "date_modified": {
+            "type": "string",
+            "example": "11/15/2022 8:34:10 AM"
+          }
+        },
+        "required": [
+          "id",
+          "title",
+          "content_category",
+          "category_description",
+          "chunk",
+          "full_url",
+          "pr_name"
+        ]
+      }
+    }
+  }
+}
